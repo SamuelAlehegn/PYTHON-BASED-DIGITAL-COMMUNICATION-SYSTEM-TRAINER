@@ -1,12 +1,48 @@
-{% extends 'base.html' %} {% block content %}
-<nav aria-label="breadcrumb">
-  <ol class="breadcrumb">
-    <li class="breadcrumb-item">
-      <a href="{% url 'AppDigitalCommunication' %}">
-        AppDigitalCommunication
-      </a>
-    </li>
-    <li class="breadcrumb-item active" aria-current="page">source_coding</li>
-  </ol>
-</nav>
-{% endblock content %}
+{% extends 'base.html' %} {% block contentIndex %}
+
+<h1>Source Coding</h1>
+<p>
+  <b> Huffman coding </b> is a lossless method for compressing and encoding text
+  based on the frequency of the characters in the text. In information theory
+  and computer science studies, Huffman code is a special type of optimal prefix
+  code that is generally utilized for lossless data compression.
+</p>
+<p>
+  We know that a file is stored on a computer as binary code and that each
+  character in the file has been assigned a binary character, and the character
+  codes generally have a fixed length for distinct characters. Huffman coding is
+  established on the frequency with which each character in the file appears and
+  the number of characters in a data structure with a frequency of zero (0). The
+  Huffman encoding for a typical text file saves around 40 percent of the size
+  of the actual data. Huffman binary code, like compiled executables, would thus
+  have a distinct space-saving. A binary file in which an ASCII character is
+  encoded with a frequency of 0.5 would have a very different frequency and
+  distribution from its ASCII equivalent.
+</p>
+<p>
+  In order to compress a file using a sequence of characters, we require a table
+  that provides us with the sequences of bits utilized for each character. This
+  table generates an encoding tree that utilizes the root/leaf path in order to
+  create a bit sequence that encodes the characters. We can follow the roots and
+  leaves to create a list of characters with the maximum bit length of the
+  encoded characters and the number of occurrences.
+</p>
+
+<form method="POST">
+  {% csrf_token %}
+  <div class="form-group">
+    <label for="inputAddress2">Input Text</label>
+    <input
+      type="text"
+      class="form-control"
+      name="inpAdd"
+      id="inputAddress2"
+      placeholder="Enter your text here"
+    />
+  </div>
+
+  <button id="subBtn" type="submit" class="btn btn-primary">Submit</button>
+</form>
+<h1>Input Text : {{data}}</h1>
+
+{% endblock contentIndex %}

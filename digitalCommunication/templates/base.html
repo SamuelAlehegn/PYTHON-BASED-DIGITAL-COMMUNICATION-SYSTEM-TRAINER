@@ -85,14 +85,15 @@
           id="menu"
         >
           <li class="nav-item">
-            <a href="#" class="nav-link align-middle px-0">
+            <a href="/" class="nav-link align-middle px-0">
               <i class="fs-4 bi-house"></i>
               <span class="ms-1 d-none d-sm-inline">Home</span>
             </a>
           </li>
           <li>
-            <a
-               data-bs-toggle="collapse"
+            <a  href=" {% url 'source_coding' %}"
+            
+              data-bs-toggle="collapse"
               class="nav-link px-0 align-middle"
             >
               <i class="fs-4 bi-speedometer2"></i>
@@ -104,7 +105,7 @@
               data-bs-parent="#menu"
             >
               <li class="w-100">
-                <a href="#" class="nav-link px-0">
+                <a  href=" {% url 'channel_coding' %}" class="nav-link px-0">
                   <span class="d-none d-sm-inline">Channel Coding</span>
                 </a>
               </li>
@@ -225,5 +226,6 @@
       crossorigin="anonymous"
     ></script>
     <script  {% static 'js/main.js' %}></script>
+
   </body>
 </html>
