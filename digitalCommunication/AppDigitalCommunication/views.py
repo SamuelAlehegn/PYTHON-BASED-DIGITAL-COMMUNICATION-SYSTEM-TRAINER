@@ -1,12 +1,15 @@
 from django.shortcuts import render
 from django.http import JsonResponse
 import json
+import numpy as np
+from ModulationPy import PSKModem
+
 
 
 # Create your views here.
 
  
-
+encoded_output = 0
  
 def index(request):
     return render(request, 'AppDigitalCommunication/index.html')
@@ -95,8 +98,8 @@ def source_coding(request):
             the_count = the_data.count(symbol)
             # calculating how many bit is required for that symbol in total  
             afterCompression += the_count * len(coding[symbol])
-        print("Space usage before compression (in bits):", beforeCompression)
-        print("Space usage after compression (in bits):", afterCompression)
+        # print("Space usage before compression (in bits):", beforeCompression)
+        # print("Space usage after compression (in bits):", afterCompression)
         return beforeCompression, afterCompression
 
 
@@ -138,6 +141,7 @@ def source_coding(request):
         TotalGain(the_data, huffmanEncoding)
         encodedOutput = OutputEncoded(the_data, huffmanEncoding)
         return encodedOutput, the_nodes[0], the_symbols, the_probabilities, symbolWithProbs, huffmanEncoding
+    
 
 
     # def HuffmanDecoding(encodedData, huffmanTree):
@@ -164,12 +168,15 @@ def source_coding(request):
     encoded_output = encoding
     # beforeCompression, afterCompression = TotalGain(the_data, coding)
     
+    beforeCompression, afterCompression = TotalGain(the_data, huffmanEncoding)
     
     
-    print("symbols: ", the_symbols)
-    print("probabilities: ", the_probabilities)
-    print("symbolWithProbs ", symbolWithProbs)
-    print("Symbols with code",huffmanEncoding)
+    # print("symbols: ", the_symbols)
+    # print("probabilities: ", the_probabilities)
+    # print("symbolWithProbs ", symbolWithProbs)
+    # print("Symbols with code",huffmanEncoding)
+    # print("Space usage before compression (in bits):", beforeCompression)
+    # print("Space usage after compression (in bits):", afterCompression)
     # print("Space usage before compression (in bits):", beforeCompression)
     # print("Space usage after compression (in bits):", afterCompression)
  
@@ -177,220 +184,250 @@ def source_coding(request):
     
 
     
-    return render(request, 'AppDigitalCommunication/source_coding.html', {'data':data, 'encoded_output':encoded_output, "symbols": the_symbols, "probabilities":the_probabilities, "symbolWithProbs":symbolWithProbs, "Symbols_with_code":huffmanEncoding})
-
-
+    return render(request, 'AppDigitalCommunication/source_coding.html', {'data':data, 'encoded_output':encoded_output, "symbols": the_symbols, "probabilities":the_probabilities, "symbolWithProbs":symbolWithProbs, "Symbols_with_code":huffmanEncoding, 'beforeCompression':beforeCompression, 'afterCompression':afterCompression})
+ 
 
 def channel_coding(request):
-    class Convolutional:
-        def moveOnMachine(self, state, input):
+
+    def moveOnMachine(self, state, input):
+        nextState = 0
+        output = ""
+        if (state == 0 and input == "0"):
             nextState = 0
-            output = ""
-            if (state == 0 and input == "0"):
-                nextState = 0
-                output = "00"
-            elif (state == 0 and input == "1"):
-                nextState = 2
-                output = "11"
-            elif (state == 1 and input == "0"):
-                nextState = 0
-                output = "10"
-            elif (state == 1 and input == "1"):
-                nextState = 2
-                output = "01"
-            elif (state == 2 and input == "0"):
-                nextState = 1
-                output = "11"
-            elif (state == 2 and input == "1"):
-                nextState = 3
-                output = "00"
-            elif (state == 3 and input == "0"):
-                nextState = 1
-                output = "01"
+            output = "00"
+        elif (state == 0 and input == "1"):
+            nextState = 2
+            output = "11"
+        elif (state == 1 and input == "0"):
+            nextState = 0
+            output = "10"
+        elif (state == 1 and input == "1"):
+            nextState = 2
+            output = "01"
+        elif (state == 2 and input == "0"):
+            nextState = 1
+            output = "11"
+        elif (state == 2 and input == "1"):
+            nextState = 3
+            output = "00"
+        elif (state == 3 and input == "0"):
+            nextState = 1
+            output = "01"
+        else:
+            nextState = 3
+            output = "10"
+        return (nextState, output)
+
+    def encode(self, input):
+        i = 0
+        state = 0
+        ans = ''
+        while (i < len(input)):
+            state, output = self.moveOnMachine(state, input[i])
+            ans = ans + output
+            i = i + 1
+        return ans
+
+    def constructPath(self, path, index):
+        code = ""
+        length = len(path[0])
+        thisState = index
+        for i in range(length - 1, -1, -1):
+            if (thisState == 0):
+                code = code + "0"
+            elif (thisState == 1):
+                code = code + "0"
+            elif (thisState == 2):
+                code = code + "1"
             else:
-                nextState = 3
-                output = "10"
-            return (nextState, output)
+                code = code + "1"
+            if (i == -1):
+                thisState = 0
+            else:
+                thisState = path[thisState][i]
 
-        def encode(self, input):
-            i = 0
-            state = 0
-            ans = ''
-            while (i < len(input)):
-                state, output = self.moveOnMachine(state, input[i])
-                ans = ans + output
-                i = i + 1
-            return ans
+        return (code[::-1])
 
-        def constructPath(self, path, index):
-            code = ""
-            length = len(path[0])
-            thisState = index
-            for i in range(length - 1, -1, -1):
-                if (thisState == 0):
-                    code = code + "0"
-                elif (thisState == 1):
-                    code = code + "0"
-                elif (thisState == 2):
-                    code = code + "1"
+    # def decode(self, input):
+    #     currentPM = [None] * 4
+    #     nextPM = [None] * 4
+    #     path = [[0 for x in range(len(input) / 2)] for y in range(4)]
+    #     currentPM[0] = 0
+    #     currentPM[1] = float("inf")
+    #     currentPM[2] = float("inf")
+    #     currentPM[3] = float("inf")
+
+        i = 0
+        while (i < len(input)):
+            str = input[i: i + 2]
+            if (str == '00'):
+                if (currentPM[0] < currentPM[1] + 1):
+                    nextPM[0] = currentPM[0]
+                    path[0][i / 2] = 0
                 else:
-                    code = code + "1"
-                if (i == -1):
-                    thisState = 0
+                    nextPM[0] = currentPM[1] + 1
+                    path[0][i / 2] = 1
+
+                if (currentPM[2] + 2 < currentPM[3] + 1):
+                    nextPM[1] = currentPM[2] + 2
+                    path[1][i / 2] = 2
                 else:
-                    thisState = path[thisState][i]
+                    nextPM[1] = currentPM[3] + 1
+                    path[1][i / 2] = 3
 
-            return (code[::-1])
+                if (currentPM[0] + 2 < currentPM[1] + 1):
+                    nextPM[2] = currentPM[0] + 2
+                    path[2][i / 2] = 0
+                else:
+                    nextPM[2] = currentPM[1] + 1
+                    path[2][i / 2] = 1
 
-        # def decode(self, input):
-        #     currentPM = [None] * 4
-        #     nextPM = [None] * 4
-        #     path = [[0 for x in range(len(input) / 2)] for y in range(4)]
-        #     currentPM[0] = 0
-        #     currentPM[1] = float("inf")
-        #     currentPM[2] = float("inf")
-        #     currentPM[3] = float("inf")
+                if (currentPM[2] < currentPM[3] + 1):
+                    nextPM[3] = currentPM[2]
+                    path[3][i / 2] = 2
+                else:
+                    nextPM[3] = currentPM[3] + 1
+                    path[3][i / 2] = 3
+            ###############################
 
-            i = 0
-            while (i < len(input)):
-                str = input[i: i + 2]
-                if (str == '00'):
-                    if (currentPM[0] < currentPM[1] + 1):
-                        nextPM[0] = currentPM[0]
-                        path[0][i / 2] = 0
-                    else:
-                        nextPM[0] = currentPM[1] + 1
-                        path[0][i / 2] = 1
+            elif (str == '01'):
+                if (currentPM[0] + 1 < currentPM[1] + 2):
+                    nextPM[0] = currentPM[0] + 1
+                    path[0][i / 2] = 0
+                else:
+                    nextPM[0] = currentPM[1] + 2
+                    path[0][i / 2] = 1
 
-                    if (currentPM[2] + 2 < currentPM[3] + 1):
-                        nextPM[1] = currentPM[2] + 2
-                        path[1][i / 2] = 2
-                    else:
-                        nextPM[1] = currentPM[3] + 1
-                        path[1][i / 2] = 3
+                if (currentPM[2] + 1 < currentPM[3]):
+                    nextPM[1] = currentPM[2] + 1
+                    path[1][i / 2] = 2
+                else:
+                    nextPM[1] = currentPM[3]
+                    path[1][i / 2] = 3
 
-                    if (currentPM[0] + 2 < currentPM[1] + 1):
-                        nextPM[2] = currentPM[0] + 2
-                        path[2][i / 2] = 0
-                    else:
-                        nextPM[2] = currentPM[1] + 1
-                        path[2][i / 2] = 1
+                if (currentPM[0] + 1 < currentPM[1]):
+                    nextPM[2] = currentPM[0] + 1
+                    path[2][i / 2] = 0
+                else:
+                    nextPM[2] = currentPM[1]
+                    path[2][i / 2] = 1
 
-                    if (currentPM[2] < currentPM[3] + 1):
-                        nextPM[3] = currentPM[2]
-                        path[3][i / 2] = 2
-                    else:
-                        nextPM[3] = currentPM[3] + 1
-                        path[3][i / 2] = 3
-                ###############################
+                if (currentPM[2] + 1 < currentPM[3] + 2):
+                    nextPM[3] = currentPM[2] + 1
+                    path[3][i / 2] = 2
+                else:
+                    nextPM[3] = currentPM[3] + 2
+                    path[3][i / 2] = 3
+            ###############################
 
-                elif (str == '01'):
-                    if (currentPM[0] + 1 < currentPM[1] + 2):
-                        nextPM[0] = currentPM[0] + 1
-                        path[0][i / 2] = 0
-                    else:
-                        nextPM[0] = currentPM[1] + 2
-                        path[0][i / 2] = 1
+            elif (str == '10'):
+                if (currentPM[0] + 1 < currentPM[1]):
+                    nextPM[0] = currentPM[0] + 1
+                    path[0][i / 2] = 0
+                else:
+                    nextPM[0] = currentPM[1]
+                    path[0][i / 2] = 1
 
-                    if (currentPM[2] + 1 < currentPM[3]):
-                        nextPM[1] = currentPM[2] + 1
-                        path[1][i / 2] = 2
-                    else:
-                        nextPM[1] = currentPM[3]
-                        path[1][i / 2] = 3
+                if (currentPM[2] + 1 < currentPM[3] + 2):
+                    nextPM[1] = currentPM[2] + 1
+                    path[1][i / 2] = 2
+                else:
+                    nextPM[1] = currentPM[3] + 2
+                    path[1][i / 2] = 3
 
-                    if (currentPM[0] + 1 < currentPM[1]):
-                        nextPM[2] = currentPM[0] + 1
-                        path[2][i / 2] = 0
-                    else:
-                        nextPM[2] = currentPM[1]
-                        path[2][i / 2] = 1
+                if (currentPM[0] + 1 < currentPM[1] + 2):
+                    nextPM[2] = currentPM[0] + 1
+                    path[2][i / 2] = 0
+                else:
+                    nextPM[2] = currentPM[1] + 2
+                    path[2][i / 2] = 1
 
-                    if (currentPM[2] + 1 < currentPM[3] + 2):
-                        nextPM[3] = currentPM[2] + 1
-                        path[3][i / 2] = 2
-                    else:
-                        nextPM[3] = currentPM[3] + 2
-                        path[3][i / 2] = 3
-                ###############################
+                if (currentPM[2] + 1 < currentPM[3]):
+                    nextPM[3] = currentPM[2] + 1
+                    path[3][i / 2] = 2
+                else:
+                    nextPM[3] = currentPM[3]
+                    path[3][i / 2] = 3
+            #########################################
+            elif (str == "11"):
+                if (currentPM[0] + 2 < currentPM[1] + 1):
+                    nextPM[0] = currentPM[0] + 2
+                    path[0][i / 2] = 0
+                else:
+                    nextPM[0] = currentPM[1] + 1
+                    path[0][i / 2] = 1
 
-                elif (str == '10'):
-                    if (currentPM[0] + 1 < currentPM[1]):
-                        nextPM[0] = currentPM[0] + 1
-                        path[0][i / 2] = 0
-                    else:
-                        nextPM[0] = currentPM[1]
-                        path[0][i / 2] = 1
+                if (currentPM[2] < currentPM[3] + 1):
+                    nextPM[1] = currentPM[2]
+                    path[1][i / 2] = 2
+                else:
+                    nextPM[1] = currentPM[3] + 1
+                    path[1][i / 2] = 3
 
-                    if (currentPM[2] + 1 < currentPM[3] + 2):
-                        nextPM[1] = currentPM[2] + 1
-                        path[1][i / 2] = 2
-                    else:
-                        nextPM[1] = currentPM[3] + 2
-                        path[1][i / 2] = 3
+                if (currentPM[0] < currentPM[1] + 1):
+                    nextPM[2] = currentPM[0]
+                    path[2][i / 2] = 0
+                else:
+                    nextPM[2] = currentPM[1] + 1
+                    path[2][i / 2] = 1
 
-                    if (currentPM[0] + 1 < currentPM[1] + 2):
-                        nextPM[2] = currentPM[0] + 1
-                        path[2][i / 2] = 0
-                    else:
-                        nextPM[2] = currentPM[1] + 2
-                        path[2][i / 2] = 1
+                if (currentPM[2] + 2 < currentPM[3] + 1):
+                    nextPM[3] = currentPM[2] + 2
+                    path[3][i / 2] = 2
+                else:
+                    nextPM[3] = currentPM[3] + 1
+                    path[3][i / 2] = 3
 
-                    if (currentPM[2] + 1 < currentPM[3]):
-                        nextPM[3] = currentPM[2] + 1
-                        path[3][i / 2] = 2
-                    else:
-                        nextPM[3] = currentPM[3]
-                        path[3][i / 2] = 3
-                #########################################
-                elif (str == "11"):
-                    if (currentPM[0] + 2 < currentPM[1] + 1):
-                        nextPM[0] = currentPM[0] + 2
-                        path[0][i / 2] = 0
-                    else:
-                        nextPM[0] = currentPM[1] + 1
-                        path[0][i / 2] = 1
+            i = i + 2
+            currentPM = nextPM[:]
 
-                    if (currentPM[2] < currentPM[3] + 1):
-                        nextPM[1] = currentPM[2]
-                        path[1][i / 2] = 2
-                    else:
-                        nextPM[1] = currentPM[3] + 1
-                        path[1][i / 2] = 3
-
-                    if (currentPM[0] < currentPM[1] + 1):
-                        nextPM[2] = currentPM[0]
-                        path[2][i / 2] = 0
-                    else:
-                        nextPM[2] = currentPM[1] + 1
-                        path[2][i / 2] = 1
-
-                    if (currentPM[2] + 2 < currentPM[3] + 1):
-                        nextPM[3] = currentPM[2] + 2
-                        path[3][i / 2] = 2
-                    else:
-                        nextPM[3] = currentPM[3] + 1
-                        path[3][i / 2] = 3
-
-                i = i + 2
-                currentPM = nextPM[:]
-
-            index = currentPM.index(min(currentPM))
-            print('min error = ', min(currentPM))
-            return (self.constructPath(path, index))
+        index = currentPM.index(min(currentPM))
+        print('min error = ', min(currentPM))
+        return (self.constructPath(path, index))
 
 
     def main():
-        c = Convolutional();
-        raw_input = 10000
-        code = c.encode(raw_input)
+        # c = Convolutional();
+        raw_input = 1
+        code = encode(raw_input)
         print('code= ', code)
-        return code
         # decoded = c.decode(code)
         # print('decode = ', decoded)
+        return code
 
+    convolutionsCode = main()
+        
 
-    if __name__ == "__main__":
-       code = main()
+    return render(request, 'AppDigitalCommunication/channel_coding.html', {'convolutionsCode':convolutionsCode})
+
+def modulation(request):
+    #psk
+    modem = PSKModem(4, np.pi/4, 
+                 bin_input=True,
+                 soft_decision=False,
+                 bin_output=True)
+
+    msg = np.array([0, 0, 0, 1, 1, 0, 1, 1]) # input message
+
+    pskmodulated = modem.modulate(msg) # modulation
+    demodulated = modem.demodulate(pskmodulated) # demodulation
+
+    print("Modulated message:\n"+str(pskmodulated))
+    print("Demodulated message:\n"+str(demodulated))
     
-    return render(request, 'AppDigitalCommunication/channel_coding.html', {'convolutionalCode':convolutionalCode})
+    
+    #16-QAM
+    
+    modem = PSKModem(16, np.pi/4, 
+                 bin_input=True,
+                 soft_decision=False,
+                 bin_output=True)
+
+    msg = np.array([0, 0, 0, 1, 1, 0, 1, 1]) # input message
+
+    qammodulated = modem.modulate(msg) # modulation
+    demodulated = modem.demodulate(qammodulated) # demodulation
+
+    
+    return render(request, 'AppDigitalCommunication/modulation.html', {'pskmodulated':pskmodulated, "qammodulated":qammodulated})
+    

@@ -1,0 +1,34 @@
+{% extends 'base.html' %} {% block contentIndex %}
+
+<h1>Modulation</h1>
+<p>
+  Fundamental to all wireless communications is modulation, the process of
+  impressing the data to be transmitted on the radio carrier. Most wireless
+  transmissions today are digital, and with the limited spectrum available, the
+  type of modulation is more critical than it has ever been.
+</p>
+<p>
+  The main goal of modulation today is to squeeze as much data into the least
+  amount of spectrum possible. That objective, known as spectral efficiency,
+  measures how quickly data can be transmitted in an assigned bandwidth. The
+  unit of measurement is bits per second per Hz (b/s/Hz). Multiple techniques
+  have emerged to achieve and improve spectral efficiency.
+</p>
+These techniques are used in many modern communication systems, such as cellular
+phones, Wi-Fi, and Bluetooth. Common digital modulation techniques include
+amplitude-shift keying (ASK), frequency-shift keying (FSK), and phase-shift
+keying (PSK). ASK is the simplest of these techniques, and is used for low-speed
+data transmission. FSK is more complex and is used for high-speed data
+transmission. PSK is the most complex of the three, and is used for very
+high-speed data transmission.
+<p></p>
+{% comment %}
+<h3>Input Text : {{data}}</h3>
+<h3>Encoded output : {{encoded_output}}</h3>
+{% endcomment %} {% comment %}
+<h3>Convolutional Code : {{convolutionalCode}}</h3>
+{% endcomment %}
+<h3>PSK Modulated output : {{pskmodulated}}</h3>
+<h3>16 QAM Modulated output : {{qammodulated}}</h3>
+
+{% endblock contentIndex %}
