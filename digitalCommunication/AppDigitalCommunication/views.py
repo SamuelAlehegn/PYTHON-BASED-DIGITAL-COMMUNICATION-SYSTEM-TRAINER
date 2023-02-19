@@ -8,6 +8,7 @@ from ModulationPy import QAMModem
 from scipy import special
 import matplotlib.pyplot as plt
 from io import BytesIO
+from .utils import graph
 
 
 # Create your views here.
@@ -148,29 +149,31 @@ def source_coding(request):
     
 
 
-    # def HuffmanDecoding(encodedData, huffmanTree):
-    #     treeHead = huffmanTree
-    #     decodedOutput = []
-    #     for x in encodedData:
-    #         if x == '1':
-    #             huffmanTree = huffmanTree.right
-    #         elif x == '0':
-    #             huffmanTree = huffmanTree.left
-    #         try:
-    #             if huffmanTree.left.symbol == None and huffmanTree.right.symbol == None:
-    #                 pass
-    #         except AttributeError:
-    #             decodedOutput.append(huffmanTree.symbol)
-    #             huffmanTree = treeHead
+    def HuffmanDecoding(encodedData, huffmanTree):
+        treeHead = huffmanTree
+        decodedOutput = []
+        for x in encodedData:
+            if x == '1':
+                huffmanTree = huffmanTree.right
+            elif x == '0':
+                huffmanTree = huffmanTree.left
+            try:
+                if huffmanTree.left.symbol == None and huffmanTree.right.symbol == None:
+                    pass
+            except AttributeError:
+                decodedOutput.append(huffmanTree.symbol)
+                huffmanTree = treeHead
 
-    #     string = ''.join([str(item) for item in decodedOutput])
-    #     return string
+        string = ''.join([str(item) for item in decodedOutput])
+        return string
 
     the_data = str(data)
     #print(the_data)
-    global encoded_output 
+    
     encoding, the_tree, the_symbols, the_probabilities, symbolWithProbs, huffmanEncoding   = HuffmanEncoding(the_data)
     encoded_output = encoding
+    
+    huffmanDecoding = HuffmanDecoding(encoded_output, the_tree)
     # beforeCompression, afterCompression = TotalGain(the_data, coding)
     
     beforeCompression, afterCompression = TotalGain(the_data, huffmanEncoding)
@@ -191,14 +194,15 @@ def source_coding(request):
     
 
     
-    return render(request, 'AppDigitalCommunication/source_coding.html', {'data':data, 'encoded_output':encoded_output, "symbols": the_symbols, "probabilities":the_probabilities, "symbolWithProbs":symbolWithProbs, "Symbols_with_code":huffmanEncoding, 'beforeCompression':beforeCompression, 'afterCompression':afterCompression})
+    return render(request, 'AppDigitalCommunication/source_coding.html', {'data':data, 'encoded_output':encoded_output, "symbols": the_symbols, "probabilities":the_probabilities, "symbolWithProbs":symbolWithProbs, "Symbols_with_code":huffmanEncoding, 'beforeCompression':beforeCompression, 'afterCompression':afterCompression,'huffmanDecoding':huffmanDecoding})
  
  
  
  
 
 def channel_coding(request):
-
+    data = request.POST.get('inpAdd1')
+    
     class Convolutional:
         def moveOnMachine(self, state, input):
             nextState = 0
@@ -401,33 +405,56 @@ def channel_coding(request):
         # encoded_output = request.session['encoded_output'] 
        
         c = Convolutional();
-        raw_input = encoded_output
+        raw_input = str(data)
         code = c.encode(raw_input)
         print('code= ', code)
         # decoded = c.decode(code)
         # print('decode = ', decoded)
-        return code
+        return code, raw_input
 
-    global convCod 
+    
     # if __name__ == "__main__":
-    convCod = main()
-    return render(request, 'AppDigitalCommunication/channel_coding.html', {'convCod':convCod})
+    convCod, raw_input = main()
+    return render(request, 'AppDigitalCommunication/channel_coding.html', {'convCod':convCod, 'decoded':raw_input})
+
+
+
+
 
 def modulation(request):
+    data = request.POST.get('inpAdd1')
+    string = str(data)
+    if string=='None':
+        to_list = [0, 1, 1, 0]
+    else:
+        to_list = list(string)
+        to_list = [int(i) for i in to_list]
+    
     #qpsk
     modem = PSKModem(4, np.pi/4, 
                  bin_input=True,
                  soft_decision=False,
                  bin_output=True)
 
-    msg = np.array(convCod) # input message
+    msg = np.array(to_list) # input message
 
     pskmodulated = modem.modulate(msg) # modulation
-    demodulated = modem.demodulate(pskmodulated) # demodulation
+    pskdemodulated = modem.demodulate(pskmodulated) # demodulation
 
-    print("Modulated message:\n"+str(pskmodulated))
-    print("Demodulated message:\n"+str(demodulated))
+    # print("Modulated message:\n"+str(pskmodulated))
+    # print("Demodulated message:\n"+str(pskdemodulated))
     
+    
+    
+    # modem = PSKModem(8, np.pi/4, 
+    #              bin_input=True,
+    #              soft_decision=False,
+    #              bin_output=True)
+
+    # # msg = np.array([0, 1, 1, 0]) # input message
+
+    # fourqammodulated = modem.modulate(msg) # modulation
+    # qamdemodulated = modem.demodulate(fourqammodulated) # demodulation 
      
     #16-QAM
     
@@ -436,12 +463,12 @@ def modulation(request):
                  soft_decision=False,
                  bin_output=True)
 
-    msg = np.array(convCod) # input message
+    # msg = np.array([0, 1, 1, 0]) # input message
 
     qammodulated = modem.modulate(msg) # modulation
-    demodulated = modem.demodulate(qammodulated) # demodulation  
+    qamDemodulated = modem.demodulate(qammodulated) # demodulation  
 
-    return render(request, 'AppDigitalCommunication/modulation.html', {'pskmodulated':pskmodulated, "qammodulated":qammodulated})
+    return render(request, 'AppDigitalCommunication/modulation.html', {'pskmodulated':pskmodulated,'pskdemodulated':pskdemodulated, "qammodulated":qammodulated, 'qamDemodulated':qamDemodulated})
     
     
 
@@ -451,89 +478,5 @@ def modulation(request):
 
 
 def channel(request):
-    def BER_calc(a, b):
-        num_ber = np.sum(np.abs(a - b))
-        ber = np.mean(np.abs(a - b))
-        return int(num_ber), ber
-
-
-    def BER_qam(M, EbNo):
-        EbNo_lin = 10 ** (EbNo / 10)
-        if M > 4:
-            P = 2 * np.sqrt((np.sqrt(M) - 1) /
-                            (np.sqrt(M) * np.log2(M))) * special.erfc(np.sqrt(EbNo_lin * 3 * np.log2(M) / 2 * (M - 1)))
-        else:
-            P = 0.5 * special.erfc(np.sqrt(EbNo_lin))
-        return P
-
-
-    EbNos = np.array([i for i in range(30)])  # array of Eb/No in dBs
-    N = 100000  # number of symbols per the frame
-    N_c = 100  # number of trials
-
-    Ms = [4, 16, 64, 256]  # modulation orders
-
-    ''' Simulation loops '''
-
-    mean_BER = np.empty((len(EbNos), len(Ms)))
-    for idxM, M in enumerate(Ms):
-        print("Modulation order: ", M)
-        BER = np.empty((N_c,))
-        k = np.log2(M)  # number of bit per modulation symbol
-
-        modem = QAMModem(M,
-                        bin_input=True,
-                        soft_decision=False,
-                        bin_output=True)
-
-        for idxEbNo, EbNo in enumerate(EbNos):
-            print("EbNo: ", EbNo)
-            snrdB = EbNo + 10 * np.log10(k)  # Signal-to-Noise ratio (in dB)
-            noiseVar = 10 ** (-snrdB / 10)  # noise variance (power)
-
-            for cntr in range(N_c):
-                message_bits = np.random.randint(0, 2, int(N * k))  # message
-                modulated = modem.modulate(message_bits)  # modulation
-
-                Es = np.mean(np.abs(modulated) ** 2)  # symbol energy
-                No = Es / ((10 ** (EbNo / 10)) * np.log2(M))  # noise spectrum density
-
-                noisy = modulated + np.sqrt(No / 2) * \
-                        (np.random.randn(modulated.shape[0]) +
-                        1j * np.random.randn(modulated.shape[0]))  # AWGN
-
-                demodulated = modem.demodulate(noisy, noise_var=noiseVar)
-                NumErr, BER[cntr] = BER_calc(message_bits,
-                                            demodulated)  # bit-error ratio
-            mean_BER[idxEbNo, idxM] = np.mean(BER, axis=0)  # averaged bit-error ratio
-
-    ''' Theoretical results '''
-
-    BER_theor = np.empty((len(EbNos), len(Ms)))
-    for idxM, M in enumerate(Ms):
-        BER_theor[:, idxM] = BER_qam(M, EbNos)
-
-    ''' Curves '''
-
-    fig, ax = plt.subplots(figsize=(10, 7), dpi=300)
-
-    plt.semilogy(EbNos, BER_theor[:, 0], 'g-', label='4-QAM (theory)')
-    plt.semilogy(EbNos, BER_theor[:, 1], 'b-', label='16-QAM (theory)')
-    plt.semilogy(EbNos, BER_theor[:, 2], 'k-', label='64-QAM (theory)')
-    plt.semilogy(EbNos, BER_theor[:, 3], 'r-', label='256-QAM (theory)')
-
-    plt.semilogy(EbNos, mean_BER[:, 0], 'g-o', label='4-QAM (simulation)')
-    plt.semilogy(EbNos, mean_BER[:, 1], 'b-o', label='16-QAM (simulation)')
-    plt.semilogy(EbNos, mean_BER[:, 2], 'k-o', label='64-QAM (simulation)')
-    plt.semilogy(EbNos, mean_BER[:, 3], 'r-o', label='256-QAM (simulation)')
-
-    ax.set_ylim(1e-7, 2)
-    ax.set_xlim(0, 25.1)
-
-    plt.title("M-QAM")
-    plt.xlabel('EbNo (dB)')
-    plt.ylabel('BER')
-    plt.grid()
-    plt.legend(loc='upper right')
-    plt.savefig('qam_ber.png')
-    return render(request,  'AppDigitalCommunication/modulation.html')
+    chart = graph()
+    return render(request,  'AppDigitalCommunication/modulation.html', {'chart':chart})

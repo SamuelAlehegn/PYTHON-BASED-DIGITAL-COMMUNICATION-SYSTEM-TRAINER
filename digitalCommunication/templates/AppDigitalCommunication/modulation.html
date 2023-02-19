@@ -22,13 +22,32 @@ data transmission. FSK is more complex and is used for high-speed data
 transmission. PSK is the most complex of the three, and is used for very
 high-speed data transmission.
 <p></p>
+<form method="POST">
+  {% csrf_token %}
+  <div class="form-group">
+    <label for="inputAddress4">Input Binary Number</label>
+    <input
+      type="text"
+      class="form-control"
+      name="inpAdd1"
+      id="inputAddress4"
+      placeholder="Enter binary number [The length of the binary input should be a multiple of log2(M)]"
+    />
+  </div>
+
+  <button id="subBtn2" type="submit" class="btn btn-primary">Submit</button>
+</form>
 {% comment %}
 <h3>Input Text : {{data}}</h3>
 <h3>Encoded output : {{encoded_output}}</h3>
 {% endcomment %} {% comment %}
 <h3>Convolutional Code : {{convolutionalCode}}</h3>
 {% endcomment %}
-<h3>PSK Modulated output : {{pskmodulated}}</h3>
-<h3>16 QAM Modulated output : {{qammodulated}}</h3>
+<h4>QPSK Modulated output : {{pskmodulated}}</h4>
+<h4>QPSK Demodulated output : {{pskdemodulated}}</h4>
+
+<br />
+<h4>16 QAM Modulated output : {{qammodulated}}</h4>
+<h4>16 QAM Demodulated output : {{qamDemodulated}}</h4>
 
 {% endblock contentIndex %}

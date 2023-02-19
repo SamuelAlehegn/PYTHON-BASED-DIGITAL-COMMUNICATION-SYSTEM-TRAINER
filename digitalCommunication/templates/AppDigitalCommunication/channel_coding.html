@@ -25,8 +25,25 @@ logic is often in the form of cascaded exclusive-or gates.</p>
 />
 {% comment %} <h3>Input Text : {{data}}</h3>
 <h3>Encoded output : {{encoded_output}}</h3> {% endcomment %}
+<form method="POST">
+  {% csrf_token %}
+  <div class="form-group">
+    <label for="inputAddress3">Input Binary Number</label>
+    <input
+      type="text"
+      class="form-control"
+      name="inpAdd1"
+      id="inputAddress3"
+      placeholder="Enter binary number"
+    />
+  </div>
+
+  <button id="subBtn1" type="submit" class="btn btn-primary">Submit</button>
+</form>
 
 <h3>Convolutional Code : {{convCod}}</h3>
+<h3>viterbe decoding : {{decoded}}</h3>
+
 
 
 {% endblock contentIndex %}
