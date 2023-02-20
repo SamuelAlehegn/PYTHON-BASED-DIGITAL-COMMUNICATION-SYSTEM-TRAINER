@@ -9,6 +9,9 @@ urlpatterns = [
     path('channel_coding', views.channel_coding, name='channel_coding'),
     path('modulation', views.modulation, name='modulation'),
     path('channel', views.channel, name='channel'),
+    path('lineCoding', views.lineCoding, name='lineCoding'),
+    
+    
     
     
     

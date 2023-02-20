@@ -266,7 +266,7 @@ def channel_coding(request):
         def decode(self, input):
             currentPM = [None] * 4
             nextPM = [None] * 4
-            path = [[0 for x in range(len(input) / 2)] for y in range(4)]
+            path = [[0 for x in range(len(input) // 2)] for y in range(4)]
             currentPM[0] = 0
             currentPM[1] = float("inf")
             currentPM[2] = float("inf")
@@ -278,127 +278,127 @@ def channel_coding(request):
                 if (str == '00'):
                     if (currentPM[0] < currentPM[1] + 1):
                         nextPM[0] = currentPM[0]
-                        path[0][i / 2] = 0
+                        path[0][i // 2] = 0
                     else:
                         nextPM[0] = currentPM[1] + 1
-                        path[0][i / 2] = 1
+                        path[0][i // 2] = 1
 
                     if (currentPM[2] + 2 < currentPM[3] + 1):
                         nextPM[1] = currentPM[2] + 2
-                        path[1][i / 2] = 2
+                        path[1][i // 2] = 2
                     else:
                         nextPM[1] = currentPM[3] + 1
-                        path[1][i / 2] = 3
+                        path[1][i // 2] = 3
 
                     if (currentPM[0] + 2 < currentPM[1] + 1):
                         nextPM[2] = currentPM[0] + 2
-                        path[2][i / 2] = 0
+                        path[2][i // 2] = 0
                     else:
                         nextPM[2] = currentPM[1] + 1
-                        path[2][i / 2] = 1
+                        path[2][i // 2] = 1
 
                     if (currentPM[2] < currentPM[3] + 1):
                         nextPM[3] = currentPM[2]
-                        path[3][i / 2] = 2
+                        path[3][i // 2] = 2
                     else:
                         nextPM[3] = currentPM[3] + 1
-                        path[3][i / 2] = 3
+                        path[3][i // 2] = 3
                 ###############################
 
                 elif (str == '01'):
                     if (currentPM[0] + 1 < currentPM[1] + 2):
                         nextPM[0] = currentPM[0] + 1
-                        path[0][i / 2] = 0
+                        path[0][i // 2] = 0
                     else:
                         nextPM[0] = currentPM[1] + 2
-                        path[0][i / 2] = 1
+                        path[0][i // 2] = 1
 
                     if (currentPM[2] + 1 < currentPM[3]):
                         nextPM[1] = currentPM[2] + 1
-                        path[1][i / 2] = 2
+                        path[1][i // 2] = 2
                     else:
                         nextPM[1] = currentPM[3]
-                        path[1][i / 2] = 3
+                        path[1][i // 2] = 3
 
                     if (currentPM[0] + 1 < currentPM[1]):
                         nextPM[2] = currentPM[0] + 1
-                        path[2][i / 2] = 0
+                        path[2][i // 2] = 0
                     else:
                         nextPM[2] = currentPM[1]
-                        path[2][i / 2] = 1
+                        path[2][i // 2] = 1
 
                     if (currentPM[2] + 1 < currentPM[3] + 2):
                         nextPM[3] = currentPM[2] + 1
-                        path[3][i / 2] = 2
+                        path[3][i // 2] = 2
                     else:
                         nextPM[3] = currentPM[3] + 2
-                        path[3][i / 2] = 3
+                        path[3][i // 2] = 3
                 ###############################    
 
                 elif (str == '10'):
                     if (currentPM[0] + 1 < currentPM[1]):
                         nextPM[0] = currentPM[0] + 1
-                        path[0][i / 2] = 0
+                        path[0][i // 2] = 0
                     else:
                         nextPM[0] = currentPM[1]
-                        path[0][i / 2] = 1
+                        path[0][i // 2] = 1
 
                     if (currentPM[2] + 1 < currentPM[3] + 2):
                         nextPM[1] = currentPM[2] + 1
-                        path[1][i / 2] = 2
+                        path[1][i // 2] = 2
                     else:
                         nextPM[1] = currentPM[3] + 2
-                        path[1][i / 2] = 3
+                        path[1][i // 2] = 3
 
                     if (currentPM[0] + 1 < currentPM[1] + 2):
                         nextPM[2] = currentPM[0] + 1
-                        path[2][i / 2] = 0
+                        path[2][i // 2] = 0
                     else:
                         nextPM[2] = currentPM[1] + 2
-                        path[2][i / 2] = 1
+                        path[2][i // 2] = 1
 
                     if (currentPM[2] + 1 < currentPM[3]):
                         nextPM[3] = currentPM[2] + 1
-                        path[3][i / 2] = 2
+                        path[3][i // 2] = 2
                     else:
                         nextPM[3] = currentPM[3]
-                        path[3][i / 2] = 3
+                        path[3][i // 2] = 3
                 #########################################
                 elif (str == "11"):
                     if (currentPM[0] + 2 < currentPM[1] + 1):
                         nextPM[0] = currentPM[0] + 2
-                        path[0][i / 2] = 0
+                        path[0][i // 2] = 0
                     else:
                         nextPM[0] = currentPM[1] + 1
-                        path[0][i / 2] = 1
+                        path[0][i // 2] = 1
 
                     if (currentPM[2] < currentPM[3] + 1):
                         nextPM[1] = currentPM[2]
-                        path[1][i / 2] = 2
+                        path[1][i // 2] = 2
                     else:
                         nextPM[1] = currentPM[3] + 1
-                        path[1][i / 2] = 3
+                        path[1][i // 2] = 3
 
                     if (currentPM[0] < currentPM[1] + 1):
                         nextPM[2] = currentPM[0]
-                        path[2][i / 2] = 0
+                        path[2][i // 2] = 0
                     else:
                         nextPM[2] = currentPM[1] + 1
-                        path[2][i / 2] = 1
+                        path[2][i // 2] = 1
 
                     if (currentPM[2] + 2 < currentPM[3] + 1):
                         nextPM[3] = currentPM[2] + 2
-                        path[3][i / 2] = 2
+                        path[3][i // 2] = 2
                     else:
                         nextPM[3] = currentPM[3] + 1
-                        path[3][i / 2] = 3
+                        path[3][i // 2] = 3
 
                 i = i + 2
                 currentPM = nextPM[:]
 
             index = currentPM.index(min(currentPM))
-            print('min error = ', min(currentPM))
-            return self.constructPath(path, index)
+            min_error = min(currentPM)
+            return self.constructPath(path, index), min_error
 
 
     def main():
@@ -408,14 +408,14 @@ def channel_coding(request):
         raw_input = str(data)
         code = c.encode(raw_input)
         print('code= ', code)
-        # decoded = c.decode(code)
-        # print('decode = ', decoded)
-        return code, raw_input
+        decoded, min_error = c.decode(code)
+        print('decode = ', decoded)
+        return code, decoded, min_error, raw_input
 
     
     # if __name__ == "__main__":
-    convCod, raw_input = main()
-    return render(request, 'AppDigitalCommunication/channel_coding.html', {'convCod':convCod, 'decoded':raw_input})
+    convCod, decoded, min_error, raw_input = main()
+    return render(request, 'AppDigitalCommunication/channel_coding.html', {'convCod':convCod, 'decoded':decoded, 'min_error':min_error, 'raw_input':raw_input})
 
 
 
@@ -440,6 +440,9 @@ def modulation(request):
 
     pskmodulated = modem.modulate(msg) # modulation
     pskdemodulated = modem.demodulate(pskmodulated) # demodulation
+    # chart = modem.plot_const()
+    
+    
 
     # print("Modulated message:\n"+str(pskmodulated))
     # print("Demodulated message:\n"+str(pskdemodulated))
@@ -467,8 +470,9 @@ def modulation(request):
 
     qammodulated = modem.modulate(msg) # modulation
     qamDemodulated = modem.demodulate(qammodulated) # demodulation  
+    # chart1 = modem.plot_const()
 
-    return render(request, 'AppDigitalCommunication/modulation.html', {'pskmodulated':pskmodulated,'pskdemodulated':pskdemodulated, "qammodulated":qammodulated, 'qamDemodulated':qamDemodulated})
+    return render(request, 'AppDigitalCommunication/modulation.html', {'pskmodulated':pskmodulated,'pskdemodulated':pskdemodulated, "qammodulated":qammodulated, 'qamDemodulated':qamDemodulated, 'string':string})
     
     
 
@@ -480,3 +484,46 @@ def modulation(request):
 def channel(request):
     chart = graph()
     return render(request,  'AppDigitalCommunication/modulation.html', {'chart':chart})
+
+def lineCoding(request):
+    input_data = request.POST.get('inpAdd5')
+    string = str(input_data)
+    # if string=='None':
+    #     to_int = (0b0110 )
+    # else:
+    #     to_int = int(string)
+    L = 32 # number of digital samples per data bit
+    Fs = 8*L # Sampling frequency
+    voltageLevel = 5 # peak voltage level in Volts
+    data = string
+    clk = np.arange(0,2*len(data)) % 2 # clock samples
+
+    ami = 1*data; previousOne = 0
+
+    for ii in range(0,len(data)):
+        if (ami[ii]==1) and (previousOne==0):
+            ami[ii] = voltageLevel
+            previousOne=1;
+        if (ami[ii]==1) and (previousOne==1):
+            ami[ii]= -voltageLevel
+            previousOne = 0;
+    clk_sequence = np.repeat(clk,L)
+    data_sequence = np.repeat(data,2*L)
+    unipolar_nrz_l = voltageLevel*data_sequence
+    nrz_encoded = voltageLevel*(2*data_sequence - 1)
+    unipolar_rz = voltageLevel * (data_sequence * (1 - clk_sequence))
+    ami_sequence = np.repeat(ami,2*L)
+    manchester_encoded = voltageLevel* (2*np.logical_xor(data_sequence,clk_sequence).astype(int)-1)
+
+    fig, ax = plt.subplots(7,1,sharex='col', figsize=(10, 14))
+    ax[0].plot(clk_sequence[0:800]);ax[0].set_title('Clock')
+    ax[1].plot(data_sequence[0:800]);ax[1].set_title('Data')
+    ax[2].plot(unipolar_nrz_l[0:800]); ax[2].set_title('Unipolar non-return-to-zero level')
+    ax[3].plot(nrz_encoded[0:800]); ax[3].set_title('Bipolar Non-return-to-zero level')
+    ax[4].plot(unipolar_rz[0:800]); ax[4].set_title('Unipolar return-to-zero')
+    ax[5].plot(ami_sequence[0:800]); ax[5].set_title('Alternate Mark Inversion (AMI)')
+    ax[6].plot(manchester_encoded[0:800]); ax[6].set_title('Manchester Encoded - IEEE 802.3')
+    plt.show()
+        
+    return render(request,  'AppDigitalCommunication/lineCoding.html')
+    
