@@ -1,19 +1,38 @@
 {% extends 'base.html' %} {% block contentIndex %}
 
 <h1>Channel Coding</h1>
-<p>
+<p style="
+    font: sans-serif;
+    font-size: 19px;
+    text-align: justify;
+    margin-right: 50px;
+  ">
   Error-correcting codes are the way to deal with the errors introduced in the
   actual message signal at the time of transmission in data communication. It is
   regarded as error detection and correction technique by which the information
   signal is encoded using redundant bits. <br>
   These are categorized as:
-  <ul>
+  <ul style="
+    font: sans-serif;
+    font-size: 19px;
+    margin-left: 50px;
+  ">
     <li>Block Code</li>
     <li>Convolutional Code</li>
   </ul>
 </p>
-<p> <b>Convolutional coding</b> is known to be one of the most frequently used error correction techniques relative to digital wireless communication.</p>
-<p>Convolutional encoding of data is accomplished using a shift register and associated
+<p style="
+    font: sans-serif;
+    font-size: 19px;
+    text-align: justify;
+    margin-right: 50px;
+  "> <b>Convolutional coding</b> is known to be one of the most frequently used error correction techniques relative to digital wireless communication.</p>
+<p style="
+    font: sans-serif;
+    font-size: 19px;
+    text-align: justify;
+    margin-right: 50px;
+  ">Convolutional encoding of data is accomplished using a shift register and associated
 combinatorial logic that performs modulo-two addition. (A shift register is merely a chain
 of flip-flops wherein the output of the nth flip-flop is tied to the input of the (n+1)th flip-
 flop. Every time the active edge of the clock occurs, the input to the flip-flop is clocked
@@ -27,7 +46,8 @@ logic is often in the form of cascaded exclusive-or gates.</p>
 <h3>Encoded output : {{encoded_output}}</h3> {% endcomment %}
 <form method="POST">
   {% csrf_token %}
-  <div class="form-group">
+  <div class="form-group"  
+    style="margin-right: 50px; ">
     <label for="inputAddress3">Input Binary Number</label>
     <input
       type="text"

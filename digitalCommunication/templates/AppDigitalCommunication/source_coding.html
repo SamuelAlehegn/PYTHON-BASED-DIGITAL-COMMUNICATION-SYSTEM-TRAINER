@@ -1,13 +1,27 @@
 {% extends 'base.html' %} {% block contentIndex %}
 
 <h1>Source Coding</h1>
-<p>
+<p
+  style="
+    font: sans-serif;
+    font-size: 19px;
+    text-align: justify;
+    margin-right: 50px;
+  "
+>
   <b> Huffman coding </b> is a lossless method for compressing and encoding text
   based on the frequency of the characters in the text. In information theory
   and computer science studies, Huffman code is a special type of optimal prefix
   code that is generally utilized for lossless data compression.
 </p>
-<p>
+<p
+  style="
+    font: sans-serif;
+    font-size: 19px;
+    text-align: justify;
+    margin-right: 50px;
+  "
+>
   We know that a file is stored on a computer as binary code and that each
   character in the file has been assigned a binary character, and the character
   codes generally have a fixed length for distinct characters. Huffman coding is
@@ -19,7 +33,14 @@
   encoded with a frequency of 0.5 would have a very different frequency and
   distribution from its ASCII equivalent.
 </p>
-<p>
+<p
+  style="
+    font: sans-serif;
+    font-size: 19px;
+    text-align: justify;
+    margin-right: 50px;
+  "
+>
   In order to compress a file using a sequence of characters, we require a table
   that provides us with the sequences of bits utilized for each character. This
   table generates an encoding tree that utilizes the root/leaf path in order to
@@ -30,7 +51,7 @@
 
 <form method="POST">
   {% csrf_token %}
-  <div class="form-group">
+  <div class="form-group" style="margin-right: 50px">
     <label for="inputAddress2">Input Text</label>
     <input
       type="text"
@@ -43,13 +64,13 @@
 
   <button id="subBtn" type="submit" class="btn btn-primary">Submit</button>
 </form>
-<h3>Input Text : {{data}}</h3>
-<h3>The symbols : {{symbols}}</h3>
-<h3>The probabilities : {{probabilities}}</h3>
-<h3>The symbol With probabilities : {{symbolWithProbs}}</h3>
-<h3>Symbols with code : {{Symbols_with_code}}</h3>
-<h3>Space usage before compression (in bits) : {{beforeCompression}}</h3>
-<h3>Space usage after compression (in bits) : {{afterCompression}}</h3>
+<h4>Input Text : {{data}}</h4>
+<h4>The symbols : {{symbols}}</h4>
+<h4>The probabilities : {{probabilities}}</h4>
+<h4>The symbol With probabilities : {{symbolWithProbs}}</h4>
+<h4>Symbols with code : {{Symbols_with_code}}</h4>
+<h4>Space usage before compression (in bits) : {{beforeCompression}}</h4>
+<h4>Space usage after compression (in bits) : {{afterCompression}}</h4>
 
 <h3>Encoded output : {{encoded_output}}</h3>
 <h3>Decoded output : {{huffmanDecoding}}</h3>

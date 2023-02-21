@@ -487,25 +487,27 @@ def channel(request):
 
 def lineCoding(request):
     input_data = request.POST.get('inpAdd5')
-    string = str(input_data)
-    # if string=='None':
-    #     to_int = (0b0110 )
+    # if input_data == 'None':
+    #     data = (1111).astype(int)
     # else:
-    #     to_int = int(string)
+    #     string = str(input_data)
+    #     data = int(string).astype(int)
+    
     L = 32 # number of digital samples per data bit
     Fs = 8*L # Sampling frequency
     voltageLevel = 5 # peak voltage level in Volts
-    data = string
+    data = (np.random.rand(10000)>0.5).astype(int) # random 1s and 0s for data
+    print(data)
     clk = np.arange(0,2*len(data)) % 2 # clock samples
 
     ami = 1*data; previousOne = 0
 
-    for ii in range(0,len(data)):
-        if (ami[ii]==1) and (previousOne==0):
-            ami[ii] = voltageLevel
+    for i in range(0,len(data)):
+        if (ami[i]==1) and (previousOne==0):
+            ami[i] = voltageLevel
             previousOne=1;
-        if (ami[ii]==1) and (previousOne==1):
-            ami[ii]= -voltageLevel
+        if (ami[i]==1) and (previousOne==1):
+            ami[i]= -voltageLevel
             previousOne = 0;
     clk_sequence = np.repeat(clk,L)
     data_sequence = np.repeat(data,2*L)
@@ -518,12 +520,11 @@ def lineCoding(request):
     fig, ax = plt.subplots(7,1,sharex='col', figsize=(10, 14))
     ax[0].plot(clk_sequence[0:800]);ax[0].set_title('Clock')
     ax[1].plot(data_sequence[0:800]);ax[1].set_title('Data')
-    ax[2].plot(unipolar_nrz_l[0:800]); ax[2].set_title('Unipolar non-return-to-zero level')
-    ax[3].plot(nrz_encoded[0:800]); ax[3].set_title('Bipolar Non-return-to-zero level')
-    ax[4].plot(unipolar_rz[0:800]); ax[4].set_title('Unipolar return-to-zero')
-    ax[5].plot(ami_sequence[0:800]); ax[5].set_title('Alternate Mark Inversion (AMI)')
-    ax[6].plot(manchester_encoded[0:800]); ax[6].set_title('Manchester Encoded - IEEE 802.3')
+    ax[2].plot(unipolar_nrz_l[0:800]); ax[2].set_title('Unipolar NRZ level')
+    ax[3].plot(nrz_encoded[0:800]); ax[3].set_title('Bipolar NRZ level')
+    ax[4].plot(unipolar_rz[0:800]); ax[4].set_title('Unipolar RZ')
+    ax[5].plot(ami_sequence[0:800]); ax[5].set_title('Alternate Mark')
+    ax[6].plot(manchester_encoded[0:800]); ax[6].set_title('Manchester Encoded')
     plt.show()
-        
     return render(request,  'AppDigitalCommunication/lineCoding.html')
     
