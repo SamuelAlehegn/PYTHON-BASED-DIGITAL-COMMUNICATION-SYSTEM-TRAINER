@@ -8,7 +8,7 @@ from ModulationPy import QAMModem
 from scipy import special
 import matplotlib.pyplot as plt
 from io import BytesIO
-from .utils import graph
+# from .utils import graph
 
 
 # Create your views here.
@@ -482,8 +482,8 @@ def modulation(request):
 
 
 def channel(request):
-    chart = graph()
-    return render(request,  'AppDigitalCommunication/modulation.html', {'chart':chart})
+
+    return render(request,  'AppDigitalCommunication/channel.html')
 
 def lineCoding(request):
     input_data = request.POST.get('inpAdd5')
